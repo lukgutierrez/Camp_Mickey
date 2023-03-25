@@ -26,6 +26,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -58,9 +59,10 @@ class _MyAppState extends State<MyApp> {
     await Directory(dirPath).create(recursive: true);
 
     // Generar el nombre de archivo para la foto
-    // late final String filePath =
-    //     "$dirPath/${DateTime.now().millisecondsSinceEpoch}.jpg";
-    // Init Camera
+    final String filePath =
+        "$dirPath/${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    // Inicializar la cámara
     try {
       await widget.camera.initialize();
     } catch (e) {
@@ -69,14 +71,23 @@ class _MyAppState extends State<MyApp> {
     }
 
     // Tomar la foto
-    try {
-      await widget.camera.initialize();
-      await widget.camera.takePicture();
-      setState(() {
-        _photoCount++;
-      });
-    } catch (e) {
-      print('Error al tomar la foto: $e');
+    for (var i = 0; i < 10; i++) {
+      try {
+        await widget.camera.initialize();
+        final XFile photo = await widget.camera.takePicture();
+        setState(() {
+          _photoCount++;
+        });
+
+        // Guardar la foto en el almacenamiento local
+        final File localFile = File(photo.path);
+        await localFile.copy(filePath);
+
+        // Guardar la foto en la galería
+        await GallerySaver.saveImage(filePath);
+      } catch (e) {
+        print('Error al tomar la foto: $e');
+      }
     }
   }
 

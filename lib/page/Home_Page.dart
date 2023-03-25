@@ -17,12 +17,9 @@ class _HomePageState extends State<HomePage> {
   int _photoCount = 0;
 
   void _takePhoto() async {
-    // Obtener el directorio de almacenamiento externo
-    final Directory? extDir = await getExternalStorageDirectory();
+    final Directory? extDir = await getApplicationSupportDirectory();
     final String dirPath = '${extDir?.path}/Pictures/flutter_camera_background';
     await Directory(dirPath).create(recursive: true);
-
-    // Generar el nombre de archivo para la foto
     final String filePath =
         '$dirPath/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
@@ -73,38 +70,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
-
-// import 'package:camera/camera.dart';
-// import 'package:flutter/material.dart';
-
-// import 'Camera_Page.dart';
-
-// class HomePage extends StatefulWidget {
-//   const HomePage({Key? key}) : super(key: key);
-
-//   @override
-//   State<HomePage> createState() => _HomePageState();
-// }
-
-// class _HomePageState extends State<HomePage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         backgroundColor: Colors.red,
-//         title: Text("Test")),
-//       body: SafeArea(
-//         child: Center(
-//             child: ElevatedButton(
-//           onPressed: () async {
-//             await availableCameras().then((value) => Navigator.push(context,
-//                 MaterialPageRoute(builder: (_) => CameraPage(cameras: value))));
-//           },
-//           child:  Text("Take a Picture"),
-//         )),
-//       ),
-//     );
-//   }
-// }
