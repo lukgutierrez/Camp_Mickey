@@ -1,27 +1,3 @@
-// import 'package:camera/camera.dart';
-// import 'package:camp_mikey/page/Home_Page.dart';
-// import 'package:flutter/material.dart';
-
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-
-//   final cameras = await availableCameras();
-//   final firstCamera = cameras.first;
-//   final camera = await CameraController(firstCamera,ResolutionPreset.medium).initialize();
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//         theme: ThemeData(primaryColor: Colors.red),
-//         debugShowCheckedModeBanner: false,
-//         title: 'CAMPMICKEY',
-//         home: HomePage(camera: ));
-//   }
-// }
-
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -34,14 +10,14 @@ void main() async {
 
   // Inicializar la cámara
   final cameras = await availableCameras();
+
   final firstCamera = cameras.first;
 
   runApp(MyApp(camera: CameraController(firstCamera, ResolutionPreset.medium)));
 }
 
-// ignore: must_be_immutable
 class MyApp extends StatefulWidget {
-  final CameraController camera;
+  late CameraController camera;
 
   MyApp({required this.camera});
 
@@ -51,6 +27,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _photoCount = 0;
+  late CameraDescription _currentCamera;
+
+  void _switchCamera() async {
+    // Encontrar la cámara opuesta a la actual
+    final cameras = await availableCameras();
+    _currentCamera =
+        (_currentCamera == cameras.first) ? cameras.last : cameras.first;
+
+    // Actualizar el controlador de la cámara con la nueva cámara seleccionada
+    widget.camera.dispose();
+    widget.camera = CameraController(_currentCamera, ResolutionPreset.medium);
+    await widget.camera.initialize();
+    setState(() {});
+  }
 
   void _takePhoto() async {
     // Obtener el directorio de almacenamiento externo
@@ -73,7 +63,6 @@ class _MyAppState extends State<MyApp> {
     // Tomar la foto
     for (var i = 0; i < 10; i++) {
       try {
-        await widget.camera.initialize();
         final XFile photo = await widget.camera.takePicture();
         setState(() {
           _photoCount++;
@@ -92,6 +81,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _currentCamera = widget.camera.description;
+  }
+
+  @override
   void dispose() {
     widget.camera.dispose();
     super.dispose();
@@ -100,27 +95,25 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Background Camera Demo',
+      title: 'CamMykey',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Flutter Background Camera Demo'),
+          title: Text('camera'),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Presione el botón para tomar 10 fotos automáticamente.'),
+              Text('Presione el botón para tomar una foto.'),
               SizedBox(height: 16),
               Text('$_photoCount fotos tomadas.'),
+              ElevatedButton(
+                  onPressed: _switchCamera, child: Text("Cambiar cámara")),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            for (var i = 0; i < 10; i++) {
-              _takePhoto();
-            }
-          },
+          onPressed: _takePhoto,
           child: Icon(Icons.camera),
         ),
       ),
