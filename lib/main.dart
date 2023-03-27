@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   late CameraDescription _currentCamera;
 
   void _switchCamera() async {
+    print("Cambio de Camera");
     // Encontrar la cámara opuesta a la actual
     final cameras = await availableCameras();
     _currentCamera =
@@ -95,10 +96,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CamMykey',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: Colors.red,
+      ),
+      title: 'CamMickey',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('camera'),
+          backgroundColor: Colors.red,
+          title: Text('CamMickey'),
         ),
         body: Center(
           child: Column(
