@@ -1,0 +1,7 @@
+*Version Future
+_Photos take botton volume
+_Video fuction
+_Second plane
+
+//  flutter_background_service: ^2.4.6
+  flutter_local_notifications: ^8.2.0

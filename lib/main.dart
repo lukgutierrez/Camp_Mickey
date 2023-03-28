@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -62,7 +62,9 @@ class _MyAppState extends State<MyApp> {
     }
 
     // Tomar la foto
-    for (var i = 0; i < 10; i++) {
+
+    //for (var i = 0; i < 10; i++)
+    Timer.periodic(Duration(seconds: 2), (timer) async {
       try {
         final XFile photo = await widget.camera.takePicture();
         setState(() {
@@ -78,7 +80,7 @@ class _MyAppState extends State<MyApp> {
       } catch (e) {
         print('Error al tomar la foto: $e');
       }
-    }
+    });
   }
 
   @override
@@ -115,11 +117,15 @@ class _MyAppState extends State<MyApp> {
               Text('$_photoCount fotos tomadas.'),
               ElevatedButton(
                   onPressed: _switchCamera, child: Text("Cambiar cámara")),
+              ElevatedButton(onPressed: () {}, child: Text("Hello"))
             ],
+            //hfm342
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: _takePhoto,
+          onPressed: () {
+            _takePhoto();
+          },
           child: Icon(Icons.camera),
         ),
       ),
