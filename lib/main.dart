@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,24 +64,29 @@ class _MyAppState extends State<MyApp> {
 
     // Tomar la foto
 
-    //for (var i = 0; i < 10; i++)
-    Timer.periodic(Duration(seconds: 2), (timer) async {
-      try {
-        final XFile photo = await widget.camera.takePicture();
-        setState(() {
-          _photoCount++;
-        });
+    for (var i = 0; i < 5; i++) {
+      Timer.periodic(Duration(seconds: 4), (timer) async {
+        try {
+          final XFile photo = await widget.camera.takePicture();
+          setState(() {
+            _photoCount++;
+          });
 
-        // Guardar la foto en el almacenamiento local
-        final File localFile = File(photo.path);
-        await localFile.copy(filePath);
+          // Guardar la foto en el almacenamiento local
+          final File localFile = File(photo.path);
+          await localFile.copy(filePath);
 
-        // Guardar la foto en la galería
-        await GallerySaver.saveImage(filePath);
-      } catch (e) {
-        print('Error al tomar la foto: $e');
-      }
-    });
+          // Guardar la foto en la galería
+          await GallerySaver.saveImage(filePath);
+        } catch (e) {
+          print('Error al tomar la foto: $e');
+        }
+
+        if (_photoCount == 10) {
+          timer.cancel();
+        }
+      });
+    }
   }
 
   @override
@@ -99,36 +105,70 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.red,
-      ),
+      theme: ThemeData.dark(useMaterial3: false),
       title: 'CamMickey',
       home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.red,
-          title: Text('CamMickey'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Presione el botón para tomar una foto.'),
-              SizedBox(height: 16),
-              Text('$_photoCount fotos tomadas.'),
-              ElevatedButton(
-                  onPressed: _switchCamera, child: Text("Cambiar cámara")),
-              ElevatedButton(onPressed: () {}, child: Text("Hello"))
-            ],
-            //hfm342
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _takePhoto();
-          },
-          child: Icon(Icons.camera),
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Center(
+              child: Container(
+                child: Image(image: AssetImage("assets/backgraund.png")),
+              ),
+            ),
+            Center(
+              child: SpeedDial(
+                children: [
+                  SpeedDialChild(
+                      child: Icon(Icons.camera),
+                      backgroundColor: Colors.green,
+                      label: 'Agregar',
+                      labelStyle: TextStyle(fontSize: 18.0),
+                      onTap: () {
+                        _takePhoto();
+                      }),
+                ],
+              ),
+            )
+          ],
         ),
       ),
+    );
+  }
+}
+
+class Mickey extends StatelessWidget {
+  const Mickey({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22.0),
+      visible: true,
+      curve: Curves.bounceInOut,
+      children: [
+        SpeedDialChild(
+            child: Icon(Icons.add),
+            backgroundColor: Colors.green,
+            label: 'Agregar',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {}),
+        SpeedDialChild(
+          child: Icon(Icons.edit),
+          backgroundColor: Colors.blue,
+          label: 'Editar',
+          labelStyle: TextStyle(fontSize: 18.0),
+          onTap: () => print('Editar'),
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.delete),
+          backgroundColor: Colors.red,
+          label: 'Eliminar',
+          labelStyle: TextStyle(fontSize: 18.0),
+          onTap: () => print('Eliminar'),
+        ),
+      ],
     );
   }
 }
