@@ -28,6 +28,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _photoCount = 0;
+  bool isTakingPhoto = false;
+  Timer? _timer;
   late CameraDescription _currentCamera;
 
   void _switchCamera() async {
@@ -63,29 +65,35 @@ class _MyAppState extends State<MyApp> {
     }
 
     // Tomar la foto
+    isTakingPhoto = true;
 
-    for (var i = 0; i < 5; i++) {
-      Timer.periodic(Duration(seconds: 4), (timer) async {
-        try {
-          final XFile photo = await widget.camera.takePicture();
-          setState(() {
-            _photoCount++;
-          });
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      try {
+        final XFile photo = await widget.camera.takePicture();
+        setState(() {
+          _photoCount++;
+        });
 
-          // Guardar la foto en el almacenamiento local
-          final File localFile = File(photo.path);
-          await localFile.copy(filePath);
+        // Guardar la foto en el almacenamiento local
+        final File localFile = File(photo.path);
+        await localFile.copy(filePath);
 
-          // Guardar la foto en la galería
-          await GallerySaver.saveImage(filePath);
-        } catch (e) {
-          print('Error al tomar la foto: $e');
-        }
+        // Guardar la foto en la galería
+        await GallerySaver.saveImage(filePath);
+      } catch (e) {
+        print('Error al tomar la foto: $e');
+      }
 
-        if (_photoCount == 10) {
-          timer.cancel();
-        }
-      });
+      if (_photoCount++ == 10) {
+        timer.cancel();
+      }
+    });
+  }
+
+  void _stopTakingPhotos() {
+    if (isTakingPhoto) {
+      _timer?.cancel();
+      isTakingPhoto = false;
     }
   }
 
@@ -111,64 +119,40 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.black,
         body: Stack(
           children: [
-            Center(
+            SafeArea(
               child: Container(
                 child: Image(image: AssetImage("assets/backgraund.png")),
               ),
             ),
-            Center(
-              child: SpeedDial(
-                children: [
-                  SpeedDialChild(
-                      child: Icon(Icons.camera),
-                      backgroundColor: Colors.green,
-                      label: 'Agregar',
-                      labelStyle: TextStyle(fontSize: 18.0),
-                      onTap: () {
-                        _takePhoto();
-                      }),
-                ],
-              ),
-            )
+          ],
+        ),
+        floatingActionButton: SpeedDial(
+          backgroundColor: Color(0xFFF00A884),
+          animatedIcon: AnimatedIcons.menu_close,
+          visible: true,
+          curve: Curves.bounceInOut,
+          children: [
+            SpeedDialChild(
+                child: Icon(Icons.photo),
+                backgroundColor: Color(0xFFF00A884),
+                onTap: () {
+                  _takePhoto();
+                }),
+            SpeedDialChild(
+              child: Icon(Icons.block),
+              backgroundColor: Color(0xFFF00A884),
+              onTap: isTakingPhoto ? _stopTakingPhotos : _takePhoto,
+            ),
+            SpeedDialChild(
+                child: Icon(Icons.camera_front),
+                backgroundColor: Color(0xFFF00A884),
+                labelStyle: TextStyle(fontSize: 20.0),
+                onTap: () {
+                  _switchCamera();
+                }),
           ],
         ),
       ),
-    );
-  }
-}
-
-class Mickey extends StatelessWidget {
-  const Mickey({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SpeedDial(
-      animatedIcon: AnimatedIcons.menu_close,
-      animatedIconTheme: IconThemeData(size: 22.0),
-      visible: true,
-      curve: Curves.bounceInOut,
-      children: [
-        SpeedDialChild(
-            child: Icon(Icons.add),
-            backgroundColor: Colors.green,
-            label: 'Agregar',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () {}),
-        SpeedDialChild(
-          child: Icon(Icons.edit),
-          backgroundColor: Colors.blue,
-          label: 'Editar',
-          labelStyle: TextStyle(fontSize: 18.0),
-          onTap: () => print('Editar'),
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.delete),
-          backgroundColor: Colors.red,
-          label: 'Eliminar',
-          labelStyle: TextStyle(fontSize: 18.0),
-          onTap: () => print('Eliminar'),
-        ),
-      ],
     );
   }
 }
