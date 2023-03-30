@@ -116,7 +116,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.dark(useMaterial3: false),
       title: 'CamMickey',
       home: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFFF121B22),
         body: Stack(
           children: [
             SafeArea(

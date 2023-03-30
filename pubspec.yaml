@@ -1,5 +1,5 @@
-name: camp_mikey
-description: A new Flutter project.
+name: CampMickey
+description: Proyect Camera Backgraund.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -39,10 +39,24 @@ dependencies:
   path_provider: ^2.0.14
   gallery_saver: ^2.3.2
   flutter_speed_dial: ^6.2.0
+  flutter_launcher_icons: ^0.12.0
+  flutter_native_splash: ^2.2.19
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+  min_sdk_android: 21 
+  web:
+flutter_native_splash:
+  color: "#121212"
+  image: assets/logo1.png
+  android: true
+  ios: false
+  android_12: true
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
